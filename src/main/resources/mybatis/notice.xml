@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+ 
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.model.notice.NoticeMapper">
+
+	<insert id="create" parameterType="com.model.notice.NoticeDTO">
+		insert into notice (title,
+		content, rdate, file, cnt)
+		values (#{title}, #{content}, sysdate(),
+		#{file}, 0)
+	</insert>
+
+	<select id="list" parameterType="Map"
+		resultType="com.model.notice.NoticeDTO">
+		select noticeno, title, rdate, cnt
+		from notice
+		<where>
+			<choose>
+				<when test="col=='title'">
+					title like CONCAT('%',#{word},'%')
+				</when>
+				<when test="col=='content'">
+					contents like CONCAT('%',#{word},'%')
+				</when>
+				<when test="col=='title_content'">
+					title like CONCAT('%',#{word},'%')
+					or
+					contents like
+					CONCAT('%',#{word},'%')
+				</when>
+			</choose>
+		</where>
+		order by noticeno desc
+		limit #{sno}, #{cnt}
+	</select>
+
+	<select id="total" resultType="int" parameterType="Map">
+		select count(*) from notice
+		<where>
+			<choose>
+				<when test="col=='title'">
+					title like CONCAT('%',#{word},'%')
+				</when>
+				<when test="col=='content'">
+					contens like CONCAT('%',#{word},'%')
+				</when>
+				<when test="col=='title_content'">
+					title like CONCAT('%',#{word},'%')
+					or
+					contents like
+					CONCAT('%',#{word},'%')
+				</when>
+			</choose>
+		</where>
+	</select>
+
+	<update id="upCnt" parameterType="int">
+		update notice
+		set cnt = cnt + 1
+		where noticeno = #{noticeno}
+	</update>
+
+	<select id="read" parameterType="int"
+		resultType="com.model.notice.NoticeDTO">
+		select noticeno, title, content, rdate, file, cnt
+		from
+		notice
+		where noticeno = #{noticeno}
+	</select>
+
+	<update id="update" parameterType="com.model.notice.NoticeDTO">
+		update notice
+		set title=#{title}, content=#{content}, file=#{file}
+		where noticeno = #{noticeno}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		delete from notice
+		where
+		noticeno = #{noticeno}
+	</delete>
+
+</mapper>
